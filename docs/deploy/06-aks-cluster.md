@@ -114,12 +114,20 @@ Following the steps below will result in the provisioning of the AKS multi clust
 
         > :bulb: You want to modify your GitOps manifest file to point to your forked repo. Later on you can push changes to your repo, and they will be reflected in the state of your cluster.
 
+    1. Customize your manifests to pull images from your private ACR
+
+        ```bash
+        ACR_NAME=$(az deployment group show -g rg-bu0001a0042-shared -n shared-svcs-stamp --query properties.outputs.containerRegistryName.value -o tsv)
+
+        find . -type f -name "kustomization.yaml" -exec sed -i "s/REPLACE_ME_WITH_YOUR_ACRNAME/${ACR_NAME}/" {} +
+        ```
+
     1.  The workflow is triggered when a push on the `main` branch is detected. Therefore, push the changes to your forked repo.
 
         > :book: The app team monitors the workflow execution as this is impacting a critical piece of infrastructure. This flow works for both new or existing AKS clusters. The workflow deploys the multiple clusters in different regions, and configures the desired state for them.
 
         ```bash
-        git add -u && git add .github/workflows/aks-deploy.yaml && git commit -m "setup GitHub CD workflow" && git push origin main
+        git add -u && git add .github/workflows/aks-deploy.yaml && git commit -m "Customize manifests, flux and setup GitHub CD workflow" && git push origin main
         ```
 
         > :bulb: You might want to convert this GitHub workflow into a template since your organization or team might need to handle multiple AKS clusters. For more information, please take a look at [Sharing Workflow Templates within your organization](https://docs.github.com/actions/configuring-and-managing-workflows/sharing-workflow-templates-within-your-organization).
