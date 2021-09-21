@@ -784,6 +784,9 @@
             "apiVersion": "2021-02-01",
             "name": "[variables('clusterName')]",
             "location": "[parameters('location')]",
+            "tags": {
+                "Application identifier": "[variables('appId')]"
+            },
             "dependsOn": [
                 "[resourceId(variables('vNetResourceGroup'), 'Microsoft.Resources/deployments', 'EnsureClusterIdentityHasRbacToSelfManagedResources')]",
                 "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('clusterControlPlaneIdentityName'))]",
@@ -932,6 +935,10 @@
                 "userAssignedIdentities": {
                     "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('clusterControlPlaneIdentityName'))]": {}
                 }
+            },
+            "sku": {
+                "name": "Basic",
+                "tier": "Paid"
             },
             "resources": [
                 {
