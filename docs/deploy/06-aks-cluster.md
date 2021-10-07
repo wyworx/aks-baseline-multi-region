@@ -30,16 +30,6 @@ Following the steps below will result in the provisioning of the AKS multi clust
     ACRPRIVATEDNSZONESID=$(az deployment group show -g rg-bu0001a0042-shared -n shared-svcs-stamp --query properties.outputs.acrPrivateDnsZonesId.value -o tsv)
     ```
 
-1. Check for a pre-existing resource group with the name networkWatcherRG
-
-    ```bash
-    NETWORK_WATCHER_RG_REGION=$(az group list --query "[?name=='networkWatcherRG'].location" -o tsv)
-    ```
-
-    If your subscription is managed in such a way that Azure Network Watcher resources are found in a resource group other than the Azure default of `networkWatcherRG` or they do not use the Azure default `NetworkWatcher_<region>` naming convention, you will need to adjust the various ARM templates to compensate. Network Watchers are singletons (per region) in subscriptions, and organizations often manage them (and Flow Logs) via Azure Policy. This walkthrough assumes default naming conventions as set by Azure's [automatic deployment feature of Network Watchers](https://docs.microsoft.com/azure/network-watcher/network-watcher-create#network-watcher-is-automatically-enabled).
-
-   If at any time during the deployment you get an error stating "**resource 'NetworkWatcher_\<region>' not found**", you will need to skip flow log creation by passing `false` to that ARM template's `deployFlowLogResources` parameter or you can manually create the required Network Watcher with that name.
-
 1.  Get the corresponding AKS cluster spoke VNet resource IDs for the app team working on the application A0042.
 
     > :book: The app team will be deploying to a spoke VNet, that was already provisioned by the network team.
@@ -104,7 +94,6 @@ Following the steps below will result in the provisioning of the AKS multi clust
         sed -i "s#<log-analytics-workspace-id>#${LOGANALYTICSWORKSPACEID}#g" ./azuredeploy.parameters.eastus2.json && \
         sed -i "s#<container-registry-id>#${CONTAINERREGISTRYID}#g" ./azuredeploy.parameters.eastus2.json && \
         sed -i "s#<acrPrivateDns-zones-id>#${ACRPRIVATEDNSZONESID}#g" ./azuredeploy.parameters.eastus2.json
-        sed -i "s#<networkWatcher-RG-Region>#${NETWORK_WATCHER_RG_REGION}#g" ./azuredeploy.parameters.eastus2.json
         
         # Region 2
         sed -i "s#<cluster-spoke-vnet-resource-id>#${RESOURCEID_VNET_BU0001A0042_04}#g" ./azuredeploy.parameters.centralus.json && \
@@ -112,8 +101,7 @@ Following the steps below will result in the provisioning of the AKS multi clust
         sed -i "s#<azure-ad-aks-admin-group-object-id>#${AADOBJECTID_GROUP_CLUSTERADMIN_BU0001A004204}#g" ./azuredeploy.parameters.centralus.json && \
         sed -i "s#<log-analytics-workspace-id>#${LOGANALYTICSWORKSPACEID}#g" ./azuredeploy.parameters.centralus.json && \
         sed -i "s#<container-registry-id>#${CONTAINERREGISTRYID}#g" ./azuredeploy.parameters.centralus.json && \
-        sed -i "s#<acrPrivateDns-zones-id>#${ACRPRIVATEDNSZONESID}#g" ./azuredeploy.parameters.centralus.json,
-        sed -i "s#<networkWatcher-RG-Region>#${NETWORK_WATCHER_RG_REGION}#g" ./azuredeploy.parameters.eastus.json
+        sed -i "s#<acrPrivateDns-zones-id>#${ACRPRIVATEDNSZONESID}#g" ./azuredeploy.parameters.centralus.json
         ```
 
     1.  Customize Flux to watch your own repo.

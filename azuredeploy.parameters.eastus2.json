@@ -28,9 +28,6 @@
       },
       "acrPrivateDnsZonesId": {
         "value": "<acrPrivateDns-zones-id>"
-      },
-      "networkWatcherRGRegion": {
-        "value": "<networkWatcher-RG-Region>"
       }
     }
   }
