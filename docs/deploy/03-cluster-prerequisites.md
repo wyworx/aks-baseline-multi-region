@@ -8,6 +8,7 @@ Following the steps below will result in the provisioning of the shared Azure re
 
 | Object                        | Purpose                                                                                                                                                                                                                                                                                             |
 | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NetworkWatcherRG Resource Group      | Contains regional Network Watchers. (Most subscriptions already have this.)    
 | Azure Container Registry      | A single Azure Container Registry instance for those container images shared across multiple clusters                                                                                                                                                                                               |
 | Azure Private Dns Zone        | The Private Dns Zone for the Azure Container Registry. Later cluster can link their vNets to it                                                                                                                                                                                                     |
 | Azure Log Analytics Workspace | A Centralized Log Analytics workspace where all the logs are collected                                                                                                                                                                                                                              |
@@ -26,8 +27,9 @@ Following the steps below will result in the provisioning of the shared Azure re
 1. Check for a pre-existing resource group with the name NetworkWatcherRG, if it doesn't exist then create it.
 
     ```bash
-    NETWORK_WATCHER_RG_REGION=$(az group list --query "[?name=='NetworkWatcherRG'].location" -o tsv)
-    if [ -z ${NETWORK_WATCHER_RG_REGION} ]; then az group create --name NetworkWatcherRG --location centralus; fi
+    if [ $(az group exists --name NetworkWatcherRG) = false ]; then
+    az group create --name NetworkWatcherRG --location centralus
+    fi
     ```
 
     If your subscription is managed in such a way that Azure Network Watcher resources are found in a resource group other than the Azure default of `networkWatcherRG` or they do not use the Azure default `NetworkWatcher_<region>` naming convention, you will need to adjust the various ARM templates to compensate. Network Watchers are singletons (per region) in subscriptions, and organizations often manage them (and Flow Logs) via Azure Policy. This walkthrough assumes default naming conventions as set by Azure's [automatic deployment feature of Network Watchers](https://docs.microsoft.com/azure/network-watcher/network-watcher-create#network-watcher-is-automatically-enabled).

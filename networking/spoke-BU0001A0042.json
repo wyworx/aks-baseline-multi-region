@@ -65,6 +65,13 @@
             ],
             "metadata": {
                 "description": "The spokes's regional affinity, must be the same as the hub's location. All resources tied to this spoke will also be homed in this region. The network team maintains this approved regional list which is a subset of zones with Availability Zone support."
+            },
+            "deployFlowLogResources": {
+                "defaultValue": true,
+                "type": "bool",
+                "metadata": {
+                    "description": "Flow Logs are enabled by default, if for some reason they cause conflicts with flow log policies already in place in your subscription, you can disable them by passing 'false' to this parameter."
+                }
             }
         }
     },
@@ -86,13 +93,6 @@
         "aksNodePoolsNsgName": "[concat('nsg-', variables('clusterVNetName'), '-nodepools')]",
         "aksIlbsNsgName": "[concat('nsg-', variables('clusterVNetName'), '-aksilbs')]",
         "appGwNsgName": "[concat('nsg-', variables('clusterVNetName'), '-appgw')]",
-        "deployFlowLogResources": {
-            "defaultValue": true,
-            "type": "bool",
-            "metadata": {
-                "description": "Flow Logs are enabled by default, if for some reason they cause conflicts with flow log policies already in place in your subscription, you can disable them by passing 'false' to this parameter."
-            }
-        },
         "regionFlowLowStorageAccountName": "[take(concat('stnfl', parameters('location'), uniqueString(subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('hubRgName')))), 24)]"
     },
     "resources": [
@@ -435,7 +435,7 @@
         },
         {
             "condition": "[parameters('deployFlowLogResources')]",
-            "name": "connect-spoke-bu0001A0042-00-flowlogs",
+            "name": "[concat('connect-spoke-bu0001A0042-', parameters('appInstanceId'),'-flowlogs')]",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "networkWatcherRG",
             "apiVersion": "2020-10-01",
