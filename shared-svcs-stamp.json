@@ -59,6 +59,13 @@
             "metadata": {
                 "description": "For Azure resources that support native geo-redunancy, provide the location the redundant service will have its secondary. Should be different than the location parameter and ideally should be a paired region - https://docs.microsoft.com/azure/best-practices-availability-paired-regions. This region does not need to support availability zones."
             }
+        },
+        "networkWatcherRGRegion": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "networkWatcherRG often times already exists in a subscription. Empty string will result in using the default resource location."
+            }
         }
     },
     "variables": {
@@ -71,7 +78,8 @@
 
         "frontDoorName": "[concat('bicycle', variables('subRgUniqueString'))]",
         "frontDoorPolicyName": "[concat('policyfd', variables('subRgUniqueString'))]",
-        "fwPoliciesBaseName": "fw-policies-base"
+        "fwPoliciesBaseName": "fw-policies-base",
+        "rgName-NetworkWatchers": "networkWatcherRG"
     },
     "resources": [
         {
@@ -524,6 +532,13 @@
                 "enabledState": "Enabled",
                 "friendlyName": "[variables('frontDoorName')]"
             }
+        },
+        {
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2020-10-01",
+            "name": "[variables('rgName-NetworkWatchers')]",
+            "location": "[if(empty(parameters('networkWatcherRGRegion')), parameters('location'), parameters('networkWatcherRGRegion'))]",
+            "comments": "This is the resource group for Azure Network Watchers. Most subscriptions already have this."
         }
     ],
     "outputs": {
