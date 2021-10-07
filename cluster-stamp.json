@@ -101,6 +101,13 @@
         "kubernetesVersion": {
             "defaultValue": "1.21.2",
             "type": "string"
+        },
+        "networkWatcherRGRegion": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "networkWatcherRG often times already exists in a subscription. Empty string will result in using the default resource location."
+            }
         }
     },
     "variables": {
@@ -135,6 +142,8 @@
         "clusterControlPlaneIdentityName": "[concat('mi-', variables('clusterName'), '-controlplane')]",
 
         "keyVaultName": "[concat('kv-', variables('clusterName'))]",
+
+        "rgName-NetworkWatchers": "networkWatcherRG",
 
         "policyResourceIdAKSLinuxRestrictive": "/providers/Microsoft.Authorization/policySetDefinitions/42b8ef37-b724-4e24-bbc8-7a7708edfe00",
         "policyResourceIdEnforceHttpsIngress": "/providers/Microsoft.Authorization/policyDefinitions/1a5b4dca-0b6f-4cf5-907c-56316bc1bf3d",
@@ -604,6 +613,13 @@
                     }
                 }
             ]
+        },
+        {
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2020-10-01",
+            "name": "[variables('rgName-NetworkWatchers')]",
+            "location": "[if(empty(parameters('networkWatcherRGRegion')), parameters('location'), parameters('networkWatcherRGRegion'))]",
+            "comments": "This is the resource group for Azure Network Watchers. Most subscriptions already have this."
         },
         {
             "type": "Microsoft.Resources/deployments",
