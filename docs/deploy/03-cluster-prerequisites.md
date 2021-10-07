@@ -23,7 +23,7 @@ Following the steps below will result in the provisioning of the shared Azure re
    ```bash
    az login -t $TENANTID_AZURERBAC
    ```
-1. Check for a pre-existing resource group with the name networkWatcherRG
+1. Check for a pre-existing resource group with the name NetworkWatcherRG, if it doesn't exist then create it.
 
     ```bash
     NETWORK_WATCHER_RG_REGION=$(az group list --query "[?name=='NetworkWatcherRG'].location" -o tsv)
