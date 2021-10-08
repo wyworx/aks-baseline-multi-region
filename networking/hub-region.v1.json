@@ -95,8 +95,7 @@
         "bastionNetworkNsgName": "[concat('nsg-', parameters('location'), '-bastion')]",
         "hubLaName": "[concat('la-hub-', parameters('location'), '-', uniqueString(resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName'))))]",
         "fwPoliciesName": "[concat('fw-policies-', parameters('location'))]",
-        "regionFlowLowStorageAccountName": "[take(concat('stnfl', parameters('location'), uniqueString(resourceGroup().id)), 24)]",
-        "azureSentinelLaSolutionName": "[concat('SecurityInsights(', variables('hubLaName'), ')')]"
+        "regionFlowLowStorageAccountName": "[take(concat('stnfl', parameters('location'), uniqueString(resourceGroup().id)), 24)]"
     },
     "resources": [
         {
@@ -112,25 +111,6 @@
                 "retentionInDays": 30,
                 "publicNetworkAccessForIngestion": "Enabled",
                 "publicNetworkAccessForQuery": "Enabled"
-            }
-        },
-        {
-            "type": "Microsoft.OperationsManagement/solutions",
-            "apiVersion": "2015-11-01-preview",
-            "name": "[variables('azureSentinelLaSolutionName')]",
-            "location": "[parameters('location')]",
-            "comments": "Enables Azure Sentinel integration.",
-            "dependsOn": [
-                "[resourceId('Microsoft.OperationalInsights/workspaces', variables('hubLaName'))]"
-            ],
-            "plan": {
-                "name": "[variables('azureSentinelLaSolutionName')]",
-                "promotionCode": "",
-                "product": "OMSGallery/SecurityInsights",
-                "publisher": "Microsoft"
-            },
-            "properties": {
-                "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('hubLaName'))]"
             }
         },
         {
