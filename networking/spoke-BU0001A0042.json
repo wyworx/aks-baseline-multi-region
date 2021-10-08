@@ -65,13 +65,13 @@
             ],
             "metadata": {
                 "description": "The spokes's regional affinity, must be the same as the hub's location. All resources tied to this spoke will also be homed in this region. The network team maintains this approved regional list which is a subset of zones with Availability Zone support."
-            },
-            "deployFlowLogResources": {
-                "defaultValue": true,
-                "type": "bool",
-                "metadata": {
-                    "description": "Flow Logs are enabled by default, if for some reason they cause conflicts with flow log policies already in place in your subscription, you can disable them by passing 'false' to this parameter."
-                }
+            }
+        },
+        "deployFlowLogResources": {
+            "defaultValue": true,
+            "type": "bool",
+            "metadata": {
+                "description": "Flow Logs are enabled by default, if for some reason they cause conflicts with flow log policies already in place in your subscription, you can disable them by passing 'false' to this parameter."
             }
         }
     },
@@ -90,9 +90,6 @@
 
         "primaryClusterPipName": "[concat('pip-', variables('appId'))]",
         "subdomainName": "[concat('region', uniqueString(resourceId(variables('hubRgName'), 'Microsoft.Network/publicIpAddresses', variables('primaryClusterPipName'))) )]",
-        "aksNodePoolsNsgName": "[concat('nsg-', variables('clusterVNetName'), '-nodepools')]",
-        "aksIlbsNsgName": "[concat('nsg-', variables('clusterVNetName'), '-aksilbs')]",
-        "appGwNsgName": "[concat('nsg-', variables('clusterVNetName'), '-appgw')]",
         "regionFlowLowStorageAccountName": "[take(concat('stnfl', parameters('location'), uniqueString(subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('hubRgName')))), 24)]"
     },
     "resources": [
@@ -118,7 +115,7 @@
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-05-01",
-            "name": "variables('aksNodePoolsNsgName')",
+            "name": "[concat('nsg-', variables('clusterVNetName'), '-nodepools')]",
             "location": "[parameters('location')]",
             "comments": "Default NSG on the AKS nodepools. Feel free to constrict further!",
             "properties": {
@@ -130,7 +127,7 @@
                     "apiVersion": "2017-05-01-preview",
                     "name": "Microsoft.Insights/toHub",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('aksNodePoolsNsgName'))]"
+                        "[resourceId('Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-nodepools'))]"
                     ],
                     "properties": {
                         "workspaceId": "[variables('hubLaWorkspaceResourceId')]",
@@ -151,7 +148,7 @@
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-05-01",
-            "name": "[variables('aksIlbsNsgName')]",
+            "name": "[concat('nsg-', variables('clusterVNetName'), '-aksilbs')]",
             "location": "[parameters('location')]",
             "comments": "Default NSG on the AKS ILB subnet. Feel free to constrict further!",
             "properties": {
@@ -163,7 +160,7 @@
                     "type": "providers/diagnosticSettings",
                     "apiVersion": "2017-05-01-preview",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('aksIlbsNsgName'))]"
+                        "[resourceId('Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-aksilbs'))]"
                     ],
                     "properties": {
                         "workspaceId": "[variables('hubLaWorkspaceResourceId')]",
@@ -182,7 +179,7 @@
             ]
         },
         {
-            "name": "[variables('appGwNsgName')]",
+            "name": "[concat('nsg-', variables('clusterVNetName'), '-appgw')]",
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-05-01",
             "location": "[parameters('location')]",
@@ -265,7 +262,7 @@
                     "type": "providers/diagnosticSettings",
                     "apiVersion": "2017-05-01-preview",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('appGwNsgName'))]"
+                        "[resourceId('Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-appgw'))]"
                     ],
                     "properties": {
                         "workspaceId": "[variables('hubLaWorkspaceResourceId')]",
@@ -291,9 +288,9 @@
             "comments": "65,536 (-reserved) IPs available to the workload, split across two subnets for AKS and one for App Gateway.",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/routeTables', variables('routeTableName'))]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('appGwNsgName'))]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('aksNodePoolsNsgName'))]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('aksIlbsNsgName'))]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-appgw'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-nodepools'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-aksilbs'))]"
             ],
             "properties": {
                 "addressSpace": {
@@ -310,7 +307,7 @@
                                 "id": "[resourceId('Microsoft.Network/routeTables', variables('routeTableName'))]"
                             },
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('aksNodePoolsNsgName'))]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-nodepools'))]"
                             },
                             "privateEndpointNetworkPolicies": "Disabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
@@ -324,7 +321,7 @@
                                 "id": "[resourceId('Microsoft.Network/routeTables', variables('routeTableName'))]"
                             },
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('aksIlbsNsgName'))]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-aksilbs'))]"
                             },
                             "privateEndpointNetworkPolicies": "Disabled",
                             "privateLinkServiceNetworkPolicies": "Disabled"
@@ -335,7 +332,7 @@
                         "properties": {
                             "addressPrefix":  "[parameters('applicationGatewaySubnetAddressPrefix')]",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('appGwNsgName'))]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-appgw'))]"
                             },
                             "privateEndpointNetworkPolicies": "Disabled",
                             "privateLinkServiceNetworkPolicies": "Disabled"
@@ -440,9 +437,9 @@
             "resourceGroup": "networkWatcherRG",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('aksNodePoolsNsgName'))]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('aksIlbsNsgName'))]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('appGwNsgName'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-nodepools'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-aksilbs'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-appgw'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('clusterVNetName'))]"
             ],
             "properties": {
@@ -453,12 +450,12 @@
                     "variables": {},
                     "resources": [
                         {
-                            "name": "[concat('NetworkWatcher_', parameters('location'), '/fl', guid(resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('aksNodePoolsNsgName'))))]",
+                            "name": "[concat('NetworkWatcher_', parameters('location'), '/fl', guid(resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-nodepools'))))]",
                             "type": "Microsoft.Network/networkWatchers/flowLogs",
                             "apiVersion": "2020-05-01",
                             "location": "[parameters('location')]",
                             "properties": {
-                                "targetResourceId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('aksNodePoolsNsgName'))]",
+                                "targetResourceId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-nodepools'))]",
                                 "storageId": "[resourceId(variables('hubRgName'), 'Microsoft.Storage/storageAccounts', variables('regionFlowLowStorageAccountName'))]",
                                 "enabled": true,
                                 "format": {
@@ -478,12 +475,12 @@
                             }
                         },
                         {
-                            "name": "[concat('NetworkWatcher_', parameters('location'), '/fl', guid(resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('aksIlbsNsgName'))))]",
+                            "name": "[concat('NetworkWatcher_', parameters('location'), '/fl', guid(resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-aksilbs'))))]",
                             "type": "Microsoft.Network/networkWatchers/flowLogs",
                             "apiVersion": "2020-05-01",
                             "location": "[parameters('location')]",
                             "properties": {
-                                "targetResourceId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('aksIlbsNsgName'))]",
+                                "targetResourceId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-aksilbs'))]",
                                 "storageId": "[resourceId(variables('hubRgName'), 'Microsoft.Storage/storageAccounts', variables('regionFlowLowStorageAccountName'))]",
                                 "enabled": true,
                                 "format": {
@@ -503,12 +500,12 @@
                             }
                         },
                         {
-                            "name": "[concat('NetworkWatcher_', parameters('location'), '/fl', guid(resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('appGwNsgName'))))]",
+                            "name": "[concat('NetworkWatcher_', parameters('location'), '/fl', guid(resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-appgw'))))]",
                             "type": "Microsoft.Network/networkWatchers/flowLogs",
                             "apiVersion": "2020-05-01",
                             "location": "[parameters('location')]",
                             "properties": {
-                                "targetResourceId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('appGwNsgName'))]",
+                                "targetResourceId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('clusterVNetName'), '-appgw'))]",
                                 "storageId": "[resourceId(variables('hubRgName'), 'Microsoft.Storage/storageAccounts', variables('regionFlowLowStorageAccountName'))]",
                                 "enabled": true,
                                 "format": {
