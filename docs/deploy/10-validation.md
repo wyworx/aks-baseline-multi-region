@@ -97,6 +97,14 @@ See the centralized logs associated to each cluster, which are captured in `Cont
    | order by TimeGenerated desc
    ```
 
+## Traffic Analytics
+
+NSG Flow Logs were configured as part of the default install of this reference implementation. Along with the raw logs being stored in the storage account in the hub resource group, you can access Azure Traffic Analytics for a dashboard of network flows.
+
+1. Open the [Azure Traffic Analytics hub](https://portal.azure.com/#blade/Microsoft_Azure_Network/NetworkWatcherMenuBlade/trafficAnalytics) on the Azure Portal.
+1. Adjust filters as needed at the top.
+1. You can then see Application Ports, NSG Hits, App Gateway, and other network flows.
+
 ## Next step
 
 :arrow_forward: [Clean Up Azure Resources](./11-cleanup.md)

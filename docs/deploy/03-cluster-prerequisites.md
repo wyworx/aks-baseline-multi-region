@@ -8,6 +8,7 @@ Following the steps below will result in the provisioning of the shared Azure re
 
 | Object                        | Purpose                                                                                                                                                                                                                                                                                             |
 | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NetworkWatcherRG Resource Group      | Contains regional Network Watchers. (Most subscriptions already have this.)    
 | Azure Container Registry      | A single Azure Container Registry instance for those container images shared across multiple clusters                                                                                                                                                                                               |
 | Azure Private Dns Zone        | The Private Dns Zone for the Azure Container Registry. Later cluster can link their vNets to it                                                                                                                                                                                                     |
 | Azure Log Analytics Workspace | A Centralized Log Analytics workspace where all the logs are collected                                                                                                                                                                                                                              |
@@ -23,6 +24,17 @@ Following the steps below will result in the provisioning of the shared Azure re
    ```bash
    az login -t $TENANTID_AZURERBAC
    ```
+1. Check for a pre-existing resource group with the name NetworkWatcherRG, if it doesn't exist then create it.
+
+    ```bash
+    if [ $(az group exists --name NetworkWatcherRG) = false ]; then
+    az group create --name NetworkWatcherRG --location centralus
+    fi
+    ```
+
+    If your subscription is managed in such a way that Azure Network Watcher resources are found in a resource group other than the Azure default of `networkWatcherRG` or they do not use the Azure default `NetworkWatcher_<region>` naming convention, you will need to adjust the various ARM templates to compensate. Network Watchers are singletons (per region) in subscriptions, and organizations often manage them (and Flow Logs) via Azure Policy. This walkthrough assumes default naming conventions as set by Azure's [automatic deployment feature of Network Watchers](https://docs.microsoft.com/azure/network-watcher/network-watcher-create#network-watcher-is-automatically-enabled).
+
+   If at any time during the deployment you get an error stating "**resource 'NetworkWatcher_\<region>' not found**", you will need to skip flow log creation by passing `false` to that ARM template's `deployFlowLogResources` parameter or you can manually create the required Network Watcher with that name.
 
 1. Create the shared services resource group for your AKS clusters.
 
@@ -46,6 +58,7 @@ Following the steps below will result in the provisioning of the shared Azure re
 > | [Azure Front Door](https://docs.microsoft.com/azure/frontdoor/front-door-overview)                           |      ✓       |           |            |
 > | [Azure Firewall Policy](https://docs.microsoft.com/en-us/azure/firewall-manager/policy-overview)             |              |   ✓       |            |
 >
+
 > **Azure Monitor logs solution**
 >
 > The app team is creating multiple clusters for its new workload (Application Id: a0042). This array of clusters is a multi-region infrastructure solution composed by multiple Azure resources that regularly emit logs to Azure Monitor. All the collected data is stored in a [centralized Log Analytics workspace for the ease of operations](https://docs.microsoft.com/azure/azure-monitor/logs/design-logs-deployment) after confirming there is no need to split workspaces due to scale. The app team estimates that the ingestion rate is going to be less than `6GB/minute`, so they expect not to be throttled as this is supported by the default rate limit. If it was required, they could grow by changing this setup eventually. In other words, the design decision is to create a single Azure Log Analytics workspace instance in the `eastus2` region, and that is going to be shared among their multiple clusters. Additionally, there is no business requirement for a consolidated cross business units view at this moment, so the centralization is great option for them. Something the app team also considered while making a final decision is the fact that migrating from a _centralized_ solution to a _decentralized_ one can be much easier than doing it the other way around. As a result, the single workspace being created is a workload specific workspace, and these are some of the Azure services sending data to it:
