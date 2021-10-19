@@ -9,10 +9,12 @@ spec:
   group: aadpodidentity.k8s.io
   names:
     kind: AzureAssignedIdentity
+    listKind: AzureAssignedIdentityList
     plural: azureassignedidentities
+    singular: azureassignedidentity
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - name: v1
     schema:
       openAPIV3Schema:
         description: IngressRoute is an Ingress CRD specification.
@@ -198,11 +200,12 @@ spec:
   group: aadpodidentity.k8s.io
   names:
     kind: AzureIdentity
+    listKind: AzureIdentityList
     singular: azureidentity
     plural: azureidentities
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - name: v1
     schema:
       openAPIV3Schema:
         description: IngressRoute is an Ingress CRD specification.
@@ -388,10 +391,12 @@ spec:
   group: aadpodidentity.k8s.io
   names:
     kind: AzureIdentityBinding
+    listKind: AzureIdentityBindingList
+    singular: azureidentitybinding
     plural: azureidentitybindings
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - name: v1
     schema:
       openAPIV3Schema:
         description: IngressRoute is an Ingress CRD specification.
@@ -577,11 +582,12 @@ spec:
   group: aadpodidentity.k8s.io
   names:
     kind: AzurePodIdentityException
+    listkind: AzurePodIdentityExceptionList
     singular: azurepodidentityexception
     plural: azurepodidentityexceptions
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - name: v1
     schema:
       openAPIV3Schema:
         description: IngressRoute is an Ingress CRD specification.
