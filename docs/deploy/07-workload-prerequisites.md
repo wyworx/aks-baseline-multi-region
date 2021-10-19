@@ -35,8 +35,8 @@ Now that [the AKS clusters](./06-aks-cluster.md) have been deployed and enrolled
    > The Azure Key Vault Policy for your user was a temporary policy to allow you to upload the certificate for this walkthrough. In actual deployments, you would manage these access policies via your ARM templates using [Azure RBAC for Key Vault data plane](https://docs.microsoft.com/azure/key-vault/general/secure-your-key-vault#data-plane-and-access-policies).
 
    ```bash
-   az keyvault delete-policy --upn $(az account show --query user.name -o tsv) -n $KEYVAULT_NAME_BU0001A0042_03
-   az keyvault delete-policy --upn $(az account show --query user.name -o tsv) -n $KEYVAULT_NAME_BU0001A0042_04
+   az keyvault delete-policy --object-id $(az ad signed-in-user show --query 'objectId' -o tsv) -n $KEYVAULT_NAME_BU0001A0042_03
+   az keyvault delete-policy --object-id $(az ad signed-in-user show --query 'objectId' -o tsv) -n $KEYVAULT_NAME_BU0001A0042_04
    ```
 
 ## Check Azure Policies are in place
