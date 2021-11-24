@@ -6,28 +6,28 @@
         "value": "centralus"
       },
       "targetVnetResourceId": {
-        "value": "/subscriptions/57689d36-fb3b-4b85-b131-c04d8bff914f/resourceGroups/pplz-rg-aks2-cd/providers/Microsoft.Network/virtualNetworks/vnet-hub-spoke-BU0001A0042-04"
+        "value": "/subscriptions/57689d36-fb3b-4b85-b131-c04d8bff914f/resourceGroups/pplz-rg-aks2-cd/providers/Microsoft.Network/virtualNetworks/vnet-hub-spoke-BU0001A0042-04"
       },
       "appInstanceId": {
         "value": "04"
       },
       "clusterAdminAadGroupObjectId": {
-        "value": ""
+        "value": "1c3267e9-bfee-404d-b7bf-3ff4800ee6c3"
       },
       "k8sControlPlaneAuthorizationTenantId": {
-        "value": ""
+        "value": "5b3c42ae-1471-4ee7-9706-570217240a70"
       },
       "clusterInternalLoadBalancerIpAddress": {
         "value": "10.244.4.4"
       },
       "logAnalyticsWorkspaceId": {
-        "value": "/subscriptions/57689d36-fb3b-4b85-b131-c04d8bff914f/resourceGroups/pplz-rg-aks2-cd/providers/Microsoft.OperationalInsights/workspaces/la-hjahbhqulypmc"
+        "value": "/subscriptions/57689d36-fb3b-4b85-b131-c04d8bff914f/resourceGroups/pplz-rg-aks2-cd/providers/Microsoft.OperationalInsights/workspaces/la-hjahbhqulypmc"
       },
       "containerRegistryId": {
-        "value": "/subscriptions/57689d36-fb3b-4b85-b131-c04d8bff914f/resourceGroups/pplz-rg-aks2-cd/providers/Microsoft.ContainerRegistry/registries/acrakshjahbhqulypmc"
+        "value": "/subscriptions/57689d36-fb3b-4b85-b131-c04d8bff914f/resourceGroups/pplz-rg-aks2-cd/providers/Microsoft.ContainerRegistry/registries/acrakshjahbhqulypmc"
       },
       "acrPrivateDnsZonesId": {
-        "value": "/subscriptions/57689d36-fb3b-4b85-b131-c04d8bff914f/resourceGroups/pplz-rg-aks2-cd/providers/Microsoft.Network/privateDnsZones/privatelink.azurecr.io"
+        "value": "/subscriptions/57689d36-fb3b-4b85-b131-c04d8bff914f/resourceGroups/pplz-rg-aks2-cd/providers/Microsoft.Network/privateDnsZones/privatelink.azurecr.io"
       }
     }
   }
